@@ -1,0 +1,26 @@
+{
+  "name": "@figma/my-make-file",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite"
+  },
+  "dependencies": {
+    "pinia": "^3.0.3",
+    "vue": "^3.5.13",
+    "vue-router": "^4.5.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "4.1.12",
+    "@vitejs/plugin-vue": "^6.0.1",
+    "tailwindcss": "4.1.12",
+    "vite": "6.3.5"
+  },
+  "pnpm": {
+    "overrides": {
+      "vite": "6.3.5"
+    }
+  }
+}
