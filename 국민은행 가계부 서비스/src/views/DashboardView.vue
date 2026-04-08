@@ -15,22 +15,34 @@
 
     <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
       <div class="rounded-xl border border-green-200 bg-white p-5 shadow-sm">
-        <p class="text-sm text-gray-500">이번 달 수입</p>
+        <div class="flex items-center gap-2 text-green-600 mb-1">
+          <font-awesome-icon icon="arrow-up" class="text-xs" />
+          <p class="text-sm font-medium">이번 달 수입</p>
+        </div>
         <p class="text-2xl font-bold text-green-600">{{ formatCurrency(summary.income) }}</p>
       </div>
       <div class="rounded-xl border border-orange-200 bg-white p-5 shadow-sm">
-        <p class="text-sm text-gray-500">이번 달 지출</p>
+        <div class="flex items-center gap-2 text-orange-600 mb-1">
+          <font-awesome-icon icon="arrow-down" class="text-xs" />
+          <p class="text-sm font-medium">이번 달 지출</p>
+        </div>
         <p class="text-2xl font-bold text-orange-600">{{ formatCurrency(summary.expense) }}</p>
       </div>
       <div class="rounded-xl border border-blue-200 bg-white p-5 shadow-sm">
-        <p class="text-sm text-gray-500">이번 달 잔액</p>
+        <div class="flex items-center gap-2 text-blue-600 mb-1">
+          <font-awesome-icon icon="wallet" class="text-xs" />
+          <p class="text-sm font-medium">이번 달 잔액</p>
+        </div>
         <p class="text-2xl font-bold text-blue-600">{{ formatCurrency(summary.balance) }}</p>
       </div>
     </div>
 
     <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
       <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-        <h3 class="mb-4 text-lg font-semibold text-gray-800">수입/지출 막대 차트</h3>
+        <h3 class="mb-4 flex items-center gap-2 text-lg font-semibold text-gray-800">
+          <font-awesome-icon icon="chart-pie" class="text-orange-500" />
+          <span>수입/지출 막대 차트</span>
+        </h3>
         <div class="flex h-44 items-end justify-around gap-6 rounded-lg bg-gray-50 px-4 py-3">
           <div v-for="bar in incomeExpenseBars" :key="bar.label" class="flex w-full max-w-24 flex-col items-center gap-2">
             <div class="relative flex h-28 w-full items-end rounded bg-gray-200/70">
@@ -105,12 +117,28 @@
           <option value="expense">지출</option>
           <option value="income">수입</option>
         </select>
-        <input
+        <select
           v-model="form.title"
-          type="text"
-          placeholder="항목명"
           class="rounded-lg border border-gray-300 px-3 py-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-orange-500"
-        />
+        >
+          <option value="">{{ form.type === 'expense' ? '지출 항목 선택' : '수입 항목 선택' }}</option>
+          <template v-if="form.type === 'expense'">
+            <option value="식비">식비</option>
+            <option value="교통비">교통비</option>
+            <option value="문화생활">문화생활</option>
+            <option value="쇼핑">쇼핑</option>
+            <option value="주거비">주거비</option>
+            <option value="기타 지출">기타 지출</option>
+          </template>
+          <template v-else>
+            <option value="급여">급여</option>
+            <option value="부수입">부수입</option>
+            <option value="이자">이자</option>
+            <option value="용돈">용돈</option>
+            <option value="환급">환급</option>
+            <option value="기타 수입">기타 수입</option>
+          </template>
+        </select>
         <input
           v-model.number="form.amount"
           type="number"
@@ -127,14 +155,18 @@
       <p v-if="error" class="mt-3 text-sm text-red-600">{{ error }}</p>
       <button
         type="submit"
-        class="mt-4 rounded-lg bg-orange-500 px-5 py-2 font-semibold text-white hover:bg-orange-600"
+        class="mt-4 flex items-center gap-2 rounded-lg bg-orange-500 px-5 py-2 font-semibold text-white hover:bg-orange-600"
       >
-        추가하기
+        <font-awesome-icon icon="plus" />
+        <span>추가하기</span>
       </button>
     </form>
 
     <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-      <h3 class="mb-4 text-lg font-semibold text-gray-800">거래 내역</h3>
+      <h3 class="mb-4 flex items-center gap-2 text-lg font-semibold text-gray-800">
+        <font-awesome-icon icon="list" class="text-gray-500" />
+        <span>거래 내역</span>
+      </h3>
       <p v-if="!transactions.items.length" class="text-gray-500">아직 거래 내역이 없습니다.</p>
       <ul v-else class="space-y-3">
         <li
@@ -142,16 +174,28 @@
           :key="item.id"
           class="flex items-center justify-between rounded-lg border border-gray-200 px-4 py-3"
         >
-          <div>
-            <p class="font-medium text-gray-800">{{ item.title }}</p>
-            <p class="text-sm text-gray-500">{{ item.date }}</p>
+          <div class="flex items-center gap-3">
+            <div 
+              class="flex h-10 w-10 items-center justify-center rounded-full"
+              :class="item.type === 'income' ? 'bg-green-100 text-green-600' : 'bg-orange-100 text-orange-600'"
+            >
+              <font-awesome-icon :icon="item.type === 'income' ? 'arrow-up' : 'arrow-down'" />
+            </div>
+            <div>
+              <p class="font-medium text-gray-800">{{ item.title }}</p>
+              <p class="text-sm text-gray-500">{{ item.date }}</p>
+            </div>
           </div>
           <div class="flex items-center gap-3">
             <p :class="item.type === 'income' ? 'text-green-600' : 'text-orange-600'" class="font-semibold">
               {{ item.type === "income" ? "+" : "-" }}{{ formatCurrency(item.amount) }}
             </p>
-            <button class="text-sm text-red-500 hover:text-red-700" @click="transactions.removeTransaction(item.id)">
-              삭제
+            <button 
+              class="flex h-8 w-8 items-center justify-center rounded-full text-red-500 hover:bg-red-50 hover:text-red-700" 
+              @click="transactions.removeTransaction(item.id)"
+              title="삭제"
+            >
+              <font-awesome-icon icon="circle-minus" />
             </button>
           </div>
         </li>
@@ -161,7 +205,7 @@
 </template>
 
 <script setup>
-import { computed, ref } from "vue";
+import { computed, ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "../stores/auth";
 import { useTransactionStore } from "../stores/transactions";
@@ -169,6 +213,10 @@ import { useTransactionStore } from "../stores/transactions";
 const router = useRouter();
 const auth = useAuthStore();
 const transactions = useTransactionStore();
+
+onMounted(() => {
+  transactions.fetchTransactions();
+});
 
 const summary = computed(() => transactions.currentMonthSummary);
 const currentMonthItems = computed(() => {
